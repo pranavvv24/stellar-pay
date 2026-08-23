@@ -2,13 +2,14 @@ import Header from './components/Header';
 import WalletCard from './components/WalletCard';
 import PaymentForm from './components/PaymentForm';
 import TransactionStatus from './components/TransactionStatus';
+import { useWallet } from './hooks/useWallet';
 
 function App() {
-  // Dummy state for UI building
-  const isConnected = true;
-  const address = 'GA3D5KRYM6CB7OWQ6TWYRR3Z4T7GNZCV3CQIGIGG';
-  const balance = '12,540.50';
-  const isLoadingBalance = false; // toggle for skeleton
+  const { isConnected, address, error, isConnecting, connect, disconnect } = useWallet();
+
+  // Dummy state for UI building (balance)
+  const balance = '0.00';
+  const isLoadingBalance = false;
 
   return (
     <div className="app-container">
@@ -20,6 +21,10 @@ function App() {
           address={address} 
           balance={balance} 
           isLoading={isLoadingBalance}
+          onConnect={connect}
+          onDisconnect={disconnect}
+          isConnecting={isConnecting}
+          error={error}
         />
         
         <PaymentForm availableBalance={balance} />

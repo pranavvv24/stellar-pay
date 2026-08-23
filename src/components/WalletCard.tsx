@@ -7,9 +7,22 @@ interface WalletCardProps {
   address: string;
   balance: string;
   isLoading: boolean;
+  onConnect?: () => void;
+  onDisconnect?: () => void;
+  isConnecting?: boolean;
+  error?: string | null;
 }
 
-const WalletCard: React.FC<WalletCardProps> = ({ isConnected, address, balance, isLoading }) => {
+const WalletCard: React.FC<WalletCardProps> = ({ 
+  isConnected, 
+  address, 
+  balance, 
+  isLoading,
+  onConnect,
+  onDisconnect,
+  isConnecting,
+  error
+}) => {
   const [isFreighterInstalled, setIsFreighterInstalled] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -45,12 +58,20 @@ const WalletCard: React.FC<WalletCardProps> = ({ isConnected, address, balance, 
               <h2 className="text-lg font-medium mb-1">Connect your wallet</h2>
               <p className="text-sm text-secondary">Connect Freighter to view your balance and send payments.</p>
             </div>
+            
+            {error && (
+              <div className="text-error text-sm text-center mb-2 p-2 bg-error-light rounded" style={{ backgroundColor: 'rgba(255, 77, 79, 0.1)' }}>
+                {error}
+              </div>
+            )}
+            
             <button 
               className="btn btn-primary" 
               style={{ padding: 'var(--space-3) var(--space-6)' }}
-              disabled={isFreighterInstalled === null}
+              disabled={isFreighterInstalled === null || isConnecting}
+              onClick={onConnect}
             >
-              Connect Freighter
+              {isConnecting ? 'Connecting...' : 'Connect Freighter'}
             </button>
           </>
         )}
@@ -58,7 +79,7 @@ const WalletCard: React.FC<WalletCardProps> = ({ isConnected, address, balance, 
     );
   }
 
-  const shortenedAddress = `${address.slice(0, 6)}...${address.slice(-4)}`;
+  const shortenedAddress = address ? `${address.slice(0, 6)}...${address.slice(-4)}` : '';
 
   return (
     <div className="card flex flex-col gap-6">
@@ -88,7 +109,12 @@ const WalletCard: React.FC<WalletCardProps> = ({ isConnected, address, balance, 
       </div>
 
       <div className="flex justify-end pt-2" style={{ borderTop: '1px solid var(--color-border)' }}>
-        <button className="btn btn-ghost text-error">Disconnect</button>
+        <button 
+          className="btn btn-ghost text-error"
+          onClick={onDisconnect}
+        >
+          Disconnect
+        </button>
       </div>
     </div>
   );

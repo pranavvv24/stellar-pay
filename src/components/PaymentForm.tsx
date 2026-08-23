@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { isValidStellarAddress, validateAmount } from '../lib/validation';
 
 interface PaymentFormProps {
   availableBalance: string;
@@ -9,12 +10,15 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ availableBalance }) => {
   const [amount, setAmount] = useState('');
   const [isProcessing, setIsProcessing] = useState(false); // Dummy state
 
-  // Dummy validation
-  const addressError = address.length > 0 && address.length < 56 ? 'Invalid Stellar address' : '';
-  const amountError = amount && parseFloat(amount) <= 0 ? 'Amount must be greater than zero' : '';
+  const addressError = address.length > 0 && !isValidStellarAddress(address) ? 'Invalid Stellar address' : '';
+  const amountError = amount.length > 0 ? validateAmount(amount, availableBalance) : '';
+
+  const isFormValid = address.length > 0 && amount.length > 0 && !addressError && !amountError;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isFormValid) return;
+    
     setIsProcessing(true);
     setTimeout(() => setIsProcessing(false), 2000);
   };
@@ -32,7 +36,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ availableBalance }) => {
           <input
             id="address"
             type="text"
-            className="form-input"
+            className={`form-input ${addressError ? 'border-error' : ''}`}
             placeholder="G..."
             value={address}
             onChange={(e) => setAddress(e.target.value)}
@@ -48,7 +52,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ availableBalance }) => {
           <input
             id="amount"
             type="number"
-            className="form-input"
+            className={`form-input ${amountError ? 'border-error' : ''}`}
             placeholder="0.00"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
@@ -64,10 +68,10 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ availableBalance }) => {
           type="submit" 
           className="btn btn-primary" 
           style={{ width: '100%', padding: 'var(--space-3)' }}
-          disabled={!address || !amount || !!addressError || !!amountError || isProcessing}
+          disabled={!isFormValid || isProcessing}
         >
           {isProcessing ? (
-            <span className="flex items-center gap-2">
+            <span className="flex items-center gap-2 justify-center">
               <svg className="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ animation: 'spin 1s linear infinite' }}>
                 <line x1="12" y1="2" x2="12" y2="6"></line>
                 <line x1="12" y1="18" x2="12" y2="22"></line>

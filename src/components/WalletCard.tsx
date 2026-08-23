@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import CopyButton from './CopyButton';
+import { checkFreighterInstallation } from '../lib/freighter';
 
 interface WalletCardProps {
   isConnected: boolean;
@@ -9,16 +10,50 @@ interface WalletCardProps {
 }
 
 const WalletCard: React.FC<WalletCardProps> = ({ isConnected, address, balance, isLoading }) => {
+  const [isFreighterInstalled, setIsFreighterInstalled] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const checkInstallation = async () => {
+      const installed = await checkFreighterInstallation();
+      setIsFreighterInstalled(installed);
+    };
+    checkInstallation();
+  }, []);
+
   if (!isConnected) {
     return (
       <div className="card flex flex-col items-center justify-center gap-4" style={{ padding: 'var(--space-10)' }}>
-        <div className="text-center">
-          <h2 className="text-lg font-medium mb-1">Connect your wallet</h2>
-          <p className="text-sm text-secondary">Connect Freighter to view your balance and send payments.</p>
-        </div>
-        <button className="btn btn-primary" style={{ padding: 'var(--space-3) var(--space-6)' }}>
-          Connect Freighter
-        </button>
+        {isFreighterInstalled === false ? (
+          <>
+            <div className="text-center">
+              <h2 className="text-lg font-medium mb-1">Freighter Not Found</h2>
+              <p className="text-sm text-secondary">Please install the Freighter browser extension to continue.</p>
+            </div>
+            <a 
+              href="https://www.freighter.app/" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="btn btn-primary" 
+              style={{ padding: 'var(--space-3) var(--space-6)', textDecoration: 'none' }}
+            >
+              Install Freighter
+            </a>
+          </>
+        ) : (
+          <>
+            <div className="text-center">
+              <h2 className="text-lg font-medium mb-1">Connect your wallet</h2>
+              <p className="text-sm text-secondary">Connect Freighter to view your balance and send payments.</p>
+            </div>
+            <button 
+              className="btn btn-primary" 
+              style={{ padding: 'var(--space-3) var(--space-6)' }}
+              disabled={isFreighterInstalled === null}
+            >
+              Connect Freighter
+            </button>
+          </>
+        )}
       </div>
     );
   }

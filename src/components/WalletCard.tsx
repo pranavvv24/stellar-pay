@@ -11,6 +11,7 @@ interface WalletCardProps {
   onDisconnect?: () => void;
   isConnecting?: boolean;
   error?: string | null;
+  balanceError?: string | null;
 }
 
 const WalletCard: React.FC<WalletCardProps> = ({ 
@@ -21,7 +22,8 @@ const WalletCard: React.FC<WalletCardProps> = ({
   onConnect,
   onDisconnect,
   isConnecting,
-  error
+  error,
+  balanceError
 }) => {
   const [isFreighterInstalled, setIsFreighterInstalled] = useState<boolean | null>(null);
 
@@ -100,6 +102,10 @@ const WalletCard: React.FC<WalletCardProps> = ({
         <span className="text-sm text-secondary font-medium">Available Balance</span>
         {isLoading ? (
           <div className="skeleton" style={{ height: '48px', width: '200px' }} />
+        ) : balanceError ? (
+          <div className="text-error text-sm p-2 bg-error-light rounded" style={{ backgroundColor: 'rgba(255, 77, 79, 0.1)' }}>
+            {balanceError}
+          </div>
         ) : (
           <div className="flex items-baseline gap-2">
             <span className="text-3xl">{balance}</span>

@@ -3,13 +3,11 @@ import WalletCard from './components/WalletCard';
 import PaymentForm from './components/PaymentForm';
 import TransactionStatus from './components/TransactionStatus';
 import { useWallet } from './hooks/useWallet';
+import { useBalance } from './hooks/useBalance';
 
 function App() {
-  const { isConnected, address, error, isConnecting, connect, disconnect } = useWallet();
-
-  // Dummy state for UI building (balance)
-  const balance = '0.00';
-  const isLoadingBalance = false;
+  const { isConnected, address, error: walletError, isConnecting, connect, disconnect } = useWallet();
+  const { balance, isLoading: isLoadingBalance, error: balanceError } = useBalance(address, isConnected);
 
   return (
     <div className="app-container">
@@ -24,7 +22,8 @@ function App() {
           onConnect={connect}
           onDisconnect={disconnect}
           isConnecting={isConnecting}
-          error={error}
+          error={walletError}
+          balanceError={balanceError}
         />
         
         <PaymentForm availableBalance={balance} />

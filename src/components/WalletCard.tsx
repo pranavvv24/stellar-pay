@@ -112,8 +112,9 @@ const WalletCard: React.FC<WalletCardProps> = ({
         <button 
           className="btn btn-ghost text-error"
           onClick={onDisconnect}
+          title="Clear the current app session"
         >
-          Disconnect
+          Disconnect Session
         </button>
       </div>
     </div>

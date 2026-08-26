@@ -1,4 +1,4 @@
-import { isConnected, requestAccess, getNetworkDetails, setAllowed } from '@stellar/freighter-api';
+import { isConnected, requestAccess, getNetworkDetails, setAllowed, signTransaction } from '@stellar/freighter-api';
 
 /**
  * Checks whether the Freighter extension is installed and available.
@@ -43,4 +43,19 @@ export const getFreighterNetwork = async (): Promise<string> => {
   }
   
   return networkResponse.network;
+};
+
+/**
+ * Passes a built transaction XDR to Freighter for signing.
+ */
+export const signTransactionWithFreighter = async (transactionXdr: string, networkPassphrase: string): Promise<string> => {
+  const signResponse = await signTransaction(transactionXdr, {
+    networkPassphrase,
+  });
+
+  if (signResponse.error) {
+    throw new Error(signResponse.error as string);
+  }
+
+  return signResponse.signedTxXdr;
 };

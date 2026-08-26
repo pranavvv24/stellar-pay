@@ -1,18 +1,15 @@
 import React, { useState } from 'react';
 import { isValidStellarAddress, validateAmount } from '../lib/validation';
-import { useTransaction } from '../hooks/useTransaction';
 
 interface PaymentFormProps {
   availableBalance: string;
-  senderAddress: string;
-  isConnected: boolean;
+  onSendPayment: (address: string, amount: string) => Promise<any>;
+  isProcessing: boolean;
 }
 
-const PaymentForm: React.FC<PaymentFormProps> = ({ availableBalance, senderAddress, isConnected }) => {
+const PaymentForm: React.FC<PaymentFormProps> = ({ availableBalance, onSendPayment, isProcessing }) => {
   const [address, setAddress] = useState('');
   const [amount, setAmount] = useState('');
-  
-  const { buildTransaction, isProcessing, error: transactionError } = useTransaction(senderAddress, isConnected);
 
   const addressError = address.length > 0 && !isValidStellarAddress(address) ? 'Invalid Stellar address' : '';
   const amountError = amount.length > 0 ? validateAmount(amount, availableBalance) : '';
@@ -23,7 +20,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ availableBalance, senderAddre
     e.preventDefault();
     if (!isFormValid) return;
     
-    await buildTransaction(address, amount);
+    await onSendPayment(address, amount);
   };
 
   return (
@@ -32,12 +29,6 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ availableBalance, senderAddre
         <h2 className="text-lg font-medium mb-1">Send Payment</h2>
         <p className="text-sm text-secondary">Transfer XLM on the Testnet</p>
       </div>
-
-      {transactionError && (
-        <div className="text-error text-sm p-2 bg-error-light rounded" style={{ backgroundColor: 'rgba(255, 77, 79, 0.1)' }}>
-          {transactionError}
-        </div>
-      )}
 
       <div className="flex flex-col gap-4">
         <div className="form-group">

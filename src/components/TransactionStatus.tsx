@@ -2,7 +2,7 @@ import React from 'react';
 import CopyButton from './CopyButton';
 
 interface TransactionStatusProps {
-  status: 'idle' | 'processing' | 'success' | 'error';
+  status: 'idle' | 'awaiting_signature' | 'processing' | 'success' | 'error';
   amount?: string;
   recipient?: string;
   hash?: string;
@@ -16,10 +16,17 @@ const TransactionStatus: React.FC<TransactionStatusProps> = ({ status, amount, r
     <div className="card flex flex-col gap-4">
       <h2 className="text-lg font-medium">Transaction Status</h2>
       
+      {status === 'awaiting_signature' && (
+        <div className="flex flex-col items-center justify-center gap-3 py-6">
+          <div style={{ width: 40, height: 40, borderRadius: '50%', border: '3px solid var(--color-border)', borderTopColor: 'var(--color-accent)', animation: 'spin 1s linear infinite' }} />
+          <p className="text-sm font-medium">Waiting for Freighter approval...</p>
+        </div>
+      )}
+
       {status === 'processing' && (
         <div className="flex flex-col items-center justify-center gap-3 py-6">
           <div style={{ width: 40, height: 40, borderRadius: '50%', border: '3px solid var(--color-border)', borderTopColor: 'var(--color-accent)', animation: 'spin 1s linear infinite' }} />
-          <p className="text-sm font-medium">Awaiting signature and network confirmation...</p>
+          <p className="text-sm font-medium">Submitting to network...</p>
         </div>
       )}
 

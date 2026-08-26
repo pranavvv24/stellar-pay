@@ -1,27 +1,27 @@
 import { useState, useCallback } from 'react';
 import { TransactionBuilder, Asset, Operation } from '@stellar/stellar-sdk';
 import { server, NETWORK_PASSPHRASE } from '../lib/stellar';
+import { signTransactionWithFreighter } from '../lib/freighter';
+
+export type TransactionState = 'idle' | 'awaiting_signature' | 'processing' | 'success' | 'error';
 
 export const useTransaction = (senderAddress: string, isConnected: boolean) => {
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [status, setStatus] = useState<TransactionState>('idle');
   const [error, setError] = useState<string | null>(null);
 
-  const buildTransaction = useCallback(async (recipientAddress: string, amount: string) => {
+  const buildAndSignTransaction = useCallback(async (recipientAddress: string, amount: string) => {
     if (!isConnected || !senderAddress) {
       setError('Wallet is not connected');
+      setStatus('error');
       return null;
     }
 
-    setIsProcessing(true);
+    setStatus('awaiting_signature');
     setError(null);
     try {
-      // 1. Load the sender account to get its current sequence number
       const sourceAccount = await server.loadAccount(senderAddress);
-      
-      // 2. Fetch the current base fee from the network
       const fee = await server.fetchBaseFee();
       
-      // 3. Build the transaction
       const transaction = new TransactionBuilder(sourceAccount, {
         fee: fee.toString(),
         networkPassphrase: NETWORK_PASSPHRASE,
@@ -33,20 +33,28 @@ export const useTransaction = (senderAddress: string, isConnected: boolean) => {
           amount: amount,
         })
       )
-      .setTimeout(180) // 3 minutes timeout
+      .setTimeout(180)
       .build();
 
-      console.log('Unsigned Transaction Built:', transaction);
-      console.log('Transaction XDR:', transaction.toXdr());
-      return transaction;
+      // Sign with Freighter
+      const signedXdr = await signTransactionWithFreighter(transaction.toXdr(), NETWORK_PASSPHRASE);
+      console.log('Signed XDR:', signedXdr);
+      
+      // We will submit this later. For now, just mark it success or processing
+      setStatus('success'); // Temp success for this step
+      
+      return signedXdr;
     } catch (err: any) {
-      console.error('Error building transaction:', err);
-      setError(err?.message || 'Failed to build transaction');
+      console.error('Error in transaction flow:', err);
+      if (err?.message?.includes('User declined') || err?.message?.includes('cancelled')) {
+        setError('Transaction cancelled');
+      } else {
+        setError(err?.message || 'Failed to process transaction');
+      }
+      setStatus('error');
       return null;
-    } finally {
-      setIsProcessing(false);
     }
   }, [senderAddress, isConnected]);
 
-  return { isProcessing, error, buildTransaction };
+  return { status, error, buildAndSignTransaction };
 };

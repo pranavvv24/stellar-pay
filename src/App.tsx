@@ -4,10 +4,13 @@ import PaymentForm from './components/PaymentForm';
 import TransactionStatus from './components/TransactionStatus';
 import { useWallet } from './hooks/useWallet';
 import { useBalance } from './hooks/useBalance';
+import { useTransaction } from './hooks/useTransaction';
 
 function App() {
   const { isConnected, address, error: walletError, isConnecting, connect, disconnect } = useWallet();
   const { balance, isLoading: isLoadingBalance, error: balanceError } = useBalance(address, isConnected);
+  
+  const { status: txStatus, error: txError, buildAndSignTransaction } = useTransaction(address, isConnected);
 
   return (
     <div className="app-container">
@@ -28,15 +31,13 @@ function App() {
         
         <PaymentForm 
           availableBalance={balance} 
-          senderAddress={address} 
-          isConnected={isConnected} 
+          onSendPayment={buildAndSignTransaction}
+          isProcessing={txStatus === 'awaiting_signature' || txStatus === 'processing'}
         />
         
         <TransactionStatus 
-          status="success" // change to 'idle', 'processing', 'success', 'error' for testing
-          amount="50.00"
-          recipient="GB2V4..."
-          hash="3a5f9c...8b2d1"
+          status={txStatus}
+          errorMessage={txError || undefined}
         />
       </main>
     </div>

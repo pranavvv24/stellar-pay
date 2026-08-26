@@ -124,7 +124,7 @@ Your account will receive **10,000 XLM** of Testnet funds instantly.
 
 ## Usage Walkthrough
 
-1. **Open the app** at `https://stellar-pay-weld.vercel.app/` (or the deployed URL)
+1. **Open the app** at `https://stellar-pay-weld.vercel.app/` 
 2. **Connect your wallet** — click "Connect Freighter" in the Wallet card. Approve the connection in the Freighter popup.
 3. **View your balance** — Your live Testnet XLM balance is fetched and displayed automatically.
 4. **Enter payment details**:
@@ -167,25 +167,7 @@ stellar-pay/
 
 ## Deployment
 
-> **Live URL:** _Add your deployed URL here once live (e.g. Vercel, Netlify, Cloudflare Pages)_
-
-### Deploying to Vercel (recommended)
-
-```bash
-npm run build
-# Then connect your GitHub repo to Vercel — it auto-detects Vite projects.
-# No environment variables needed — all config is hardcoded Testnet URLs.
-```
-
-### Deploying to Netlify
-
-```bash
-npm run build
-# Build command:  npm run build
-# Publish dir:   dist
-```
-
----
+> **Live URL: *https://stellar-pay-weld.vercel.app*
 
 ## GitHub Repository
 

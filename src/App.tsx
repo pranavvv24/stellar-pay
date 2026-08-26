@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import Header from './components/Header';
 import WalletCard from './components/WalletCard';
 import PaymentForm from './components/PaymentForm';
@@ -8,9 +9,15 @@ import { useTransaction } from './hooks/useTransaction';
 
 function App() {
   const { isConnected, address, error: walletError, isConnecting, connect, disconnect } = useWallet();
-  const { balance, isLoading: isLoadingBalance, error: balanceError } = useBalance(address, isConnected);
+  const { balance, isLoading: isLoadingBalance, error: balanceError, fetchBalance } = useBalance(address, isConnected);
   
   const { status: txStatus, error: txError, txDetails, buildAndSignTransaction } = useTransaction(address, isConnected);
+
+  useEffect(() => {
+    if (txStatus === 'success') {
+      fetchBalance();
+    }
+  }, [txStatus, fetchBalance]);
 
   return (
     <div className="app-container">

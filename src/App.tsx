@@ -26,7 +26,11 @@ function App() {
           balanceError={balanceError}
         />
         
-        <PaymentForm availableBalance={balance} />
+        <PaymentForm 
+          availableBalance={balance} 
+          senderAddress={address} 
+          isConnected={isConnected} 
+        />
         
         <TransactionStatus 
           status="success" // change to 'idle', 'processing', 'success', 'error' for testing

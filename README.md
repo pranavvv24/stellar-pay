@@ -78,7 +78,7 @@ cp .env.example .env
 npm run dev
 ```
 
-The app will be available at **http://localhost:5173**
+The app will be available at **https://stellar-pay-weld.vercel.app/**
 
 ### Other Commands
 
@@ -124,7 +124,7 @@ Your account will receive **10,000 XLM** of Testnet funds instantly.
 
 ## Usage Walkthrough
 
-1. **Open the app** at `http://localhost:5173` (or the deployed URL)
+1. **Open the app** at `https://stellar-pay-weld.vercel.app/` (or the deployed URL)
 2. **Connect your wallet** — click "Connect Freighter" in the Wallet card. Approve the connection in the Freighter popup.
 3. **View your balance** — Your live Testnet XLM balance is fetched and displayed automatically.
 4. **Enter payment details**:

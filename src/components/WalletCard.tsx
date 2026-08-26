@@ -85,11 +85,11 @@ const WalletCard: React.FC<WalletCardProps> = ({
 
   return (
     <div className="card flex flex-col gap-6">
-      <div className="flex justify-between items-start">
+      <div className="flex justify-between items-start flex-wrap gap-2">
         <div className="flex flex-col gap-1">
           <span className="text-sm text-secondary font-medium">Wallet Address</span>
-          <div className="flex items-center gap-2">
-            <span className="text-base font-mono bg-bg-tertiary" style={{ backgroundColor: 'var(--color-bg-tertiary)', padding: '2px 6px', borderRadius: 'var(--radius-sm)' }}>
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-base font-mono bg-bg-tertiary" style={{ backgroundColor: 'var(--color-bg-tertiary)', padding: '2px 6px', borderRadius: 'var(--radius-sm)', wordBreak: 'break-all' }}>
               {shortenedAddress}
             </span>
             <CopyButton text={address} />

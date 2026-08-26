@@ -13,7 +13,7 @@ const TransactionStatus: React.FC<TransactionStatusProps> = ({ status, amount, r
   if (status === 'idle') return null;
 
   return (
-    <div className="card flex flex-col gap-4">
+    <div className="card flex flex-col gap-4 animate-fade-in">
       <h2 className="text-lg font-medium">Transaction Status</h2>
       
       {status === 'awaiting_signature' && (

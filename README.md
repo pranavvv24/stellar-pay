@@ -8,13 +8,13 @@ A minimal, production-quality Web3 payment interface built on the **Stellar Test
 
 ## Screenshots
 
-| Wallet Connected | Balance View |
+| Wallet Connected | Disconnected State |
 |:---:|:---:|
-| ![Wallet Connected](screenshots/wallet-connected.png) | ![Balance View](screenshots/balance-view.png) |
+| ![Wallet Connected](screenshots/wallet_connected.png) | ![Disconnected State](screenshots/disconnected_state.png) |
 
-| Send Payment Form | Transaction Success |
+| Transaction Confirmation | Transaction Successful |
 |:---:|:---:|
-| ![Send Payment](screenshots/send-payment.png) | ![Transaction Success](screenshots/transaction-success.png) |
+| ![Transaction Confirmation](screenshots/transaction_confirmation.png) | ![Transaction Successful](screenshots/transaction_successful.png) |
 
 ---
 

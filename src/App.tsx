@@ -10,7 +10,7 @@ function App() {
   const { isConnected, address, error: walletError, isConnecting, connect, disconnect } = useWallet();
   const { balance, isLoading: isLoadingBalance, error: balanceError } = useBalance(address, isConnected);
   
-  const { status: txStatus, error: txError, buildAndSignTransaction } = useTransaction(address, isConnected);
+  const { status: txStatus, error: txError, txDetails, buildAndSignTransaction } = useTransaction(address, isConnected);
 
   return (
     <div className="app-container">
@@ -38,6 +38,9 @@ function App() {
         <TransactionStatus 
           status={txStatus}
           errorMessage={txError || undefined}
+          amount={txDetails?.amount}
+          recipient={txDetails?.recipient}
+          hash={txDetails?.hash}
         />
       </main>
     </div>

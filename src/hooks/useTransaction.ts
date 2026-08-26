@@ -8,6 +8,7 @@ export type TransactionState = 'idle' | 'awaiting_signature' | 'processing' | 's
 export const useTransaction = (senderAddress: string, isConnected: boolean) => {
   const [status, setStatus] = useState<TransactionState>('idle');
   const [error, setError] = useState<string | null>(null);
+  const [txDetails, setTxDetails] = useState<{ amount: string, recipient: string, hash: string } | null>(null);
 
   const buildAndSignTransaction = useCallback(async (recipientAddress: string, amount: string) => {
     if (!isConnected || !senderAddress) {
@@ -18,6 +19,7 @@ export const useTransaction = (senderAddress: string, isConnected: boolean) => {
 
     setStatus('awaiting_signature');
     setError(null);
+    setTxDetails(null);
     try {
       const sourceAccount = await server.loadAccount(senderAddress);
       const fee = await server.fetchBaseFee();
@@ -40,21 +42,39 @@ export const useTransaction = (senderAddress: string, isConnected: boolean) => {
       const signedXdr = await signTransactionWithFreighter(transaction.toXdr(), NETWORK_PASSPHRASE);
       console.log('Signed XDR:', signedXdr);
       
-      // We will submit this later. For now, just mark it success or processing
-      setStatus('success'); // Temp success for this step
+      setStatus('processing');
+
+      // Submit transaction
+      const transactionToSubmit = TransactionBuilder.fromXdr(signedXdr, NETWORK_PASSPHRASE);
+      const response = await server.submitTransaction(transactionToSubmit as any);
       
-      return signedXdr;
+      console.log('Transaction success! Hash:', response.hash);
+
+      setTxDetails({
+        amount,
+        recipient: recipientAddress,
+        hash: response.hash,
+      });
+      setStatus('success');
+      
+      return response;
     } catch (err: any) {
       console.error('Error in transaction flow:', err);
       if (err?.message?.includes('User declined') || err?.message?.includes('cancelled')) {
         setError('Transaction cancelled');
       } else {
-        setError(err?.message || 'Failed to process transaction');
+        // If it's a stellar error, it often contains extras.result_codes
+        if (err.response && err.response.data && err.response.data.extras) {
+          const resultCodes = err.response.data.extras.result_codes;
+          setError(`Transaction failed: ${resultCodes.transaction || 'unknown error'}`);
+        } else {
+          setError(err?.message || 'Failed to process transaction');
+        }
       }
       setStatus('error');
       return null;
     }
   }, [senderAddress, isConnected]);
 
-  return { status, error, buildAndSignTransaction };
+  return { status, error, txDetails, buildAndSignTransaction };
 };

@@ -61,15 +61,28 @@ export const useTransaction = (senderAddress: string, isConnected: boolean) => {
     } catch (err: any) {
       console.error('Error in transaction flow:', err);
       if (err?.message?.includes('User declined') || err?.message?.includes('cancelled')) {
-        setError('Transaction cancelled');
-      } else {
-        // If it's a stellar error, it often contains extras.result_codes
-        if (err.response && err.response.data && err.response.data.extras) {
-          const resultCodes = err.response.data.extras.result_codes;
-          setError(`Transaction failed: ${resultCodes.transaction || 'unknown error'}`);
+        setError('Transaction cancelled by user.');
+      } else if (err?.response?.data?.extras?.result_codes) {
+        // Handle Stellar network error codes
+        const resultCodes = err.response.data.extras.result_codes;
+        const txCode = resultCodes.transaction;
+        const opCodes = resultCodes.operations || [];
+        
+        if (txCode === 'tx_insufficient_balance') {
+          setError("You don't have enough XLM to pay the network fee for this transaction.");
+        } else if (txCode === 'tx_bad_seq') {
+          setError("Transaction sequence error. Please wait a moment and try again.");
+        } else if (opCodes.includes('op_no_destination')) {
+          setError("The destination account doesn't exist on the network. It must be funded with a minimum balance first.");
+        } else if (opCodes.includes('op_underfunded')) {
+          setError("You don't have enough XLM to send this amount and maintain your account's minimum balance.");
+        } else if (opCodes.includes('op_low_reserve')) {
+          setError("The destination account doesn't have enough XLM to satisfy the minimum reserve requirements.");
         } else {
-          setError(err?.message || 'Failed to process transaction');
+          setError(`Transaction rejected by network (${txCode}).`);
         }
+      } else {
+        setError(err?.message || 'A network error occurred while submitting the transaction.');
       }
       setStatus('error');
       return null;
